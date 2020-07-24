@@ -1,5 +1,47 @@
 const User = require('../../models').User;
 module.exports = {
+	async getUser(req, res) {
+		// [
+		// 	{
+		// 		"id": 1,
+		// 		"email": "dario@gmail.com",
+		// 		"password": "1234",
+		// 		"createdAt": "2020-07-24T02:03:44.631Z",
+		// 		"updatedAt": "2020-07-24T02:03:44.631Z"
+		// 	}
+		// ]
+		try {
+			const { user } = req.body;
+			const userCollection = await User.findAll({
+				where: {
+					email: user.email,
+				},
+			});
+			if (userCollection.length) {
+				const userData = userCollection[0];
+				if (userData.password === user.password) {
+					res.status(200).json({
+						status: true,
+						data: {
+							email: user.email,
+						},
+					});
+				} else {
+					res.status(200).json({
+						status: false,
+						message: 'wrong email or password',
+					});
+				}
+			}
+			res.status(200).json({
+				status: false,
+				message: 'email not registered.',
+			});
+		} catch (e) {
+			res.status(400).send(e.message);
+		}
+	},
+
 	async getAllUsers(req, res) {
 		try {
 			const userCollection = await User.findAll({});
