@@ -4,6 +4,7 @@
 	"description": "",
 	"main": "server.js",
 	"scripts": {
+		"start": "PORT=3000 nodemon index.js",
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"author": "Dario Velez Roman",
@@ -16,5 +17,8 @@
 		"pg-hstore": "^2.3.3",
 		"sequelize": "^6.3.3",
 		"sequelize-cli": "^6.2.0"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.4"
 	}
 }

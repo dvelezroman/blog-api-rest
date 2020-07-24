@@ -10,10 +10,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 require('./server/router/v1')(app);
-
+const MULTI_CORE = process.env.MULTI_CORE || false;
 const PORT = process.env.PORT || 8080;
 
-if (clusterWorkerSize > 1) {
+if (MULTI_CORE && clusterWorkerSize > 1) {
 	if (cluster.isMaster) {
 		for (let i = 0; i < clusterWorkerSize; i++) {
 			cluster.fork();

@@ -2,9 +2,8 @@ const User = require('../../models').User;
 module.exports = {
 	async getAllUsers(req, res) {
 		try {
-			const userCollection = await User.find({});
-
-			res.status(201).send(userCollection);
+			const userCollection = await User.findAll({});
+			res.status(200).json(userCollection);
 		} catch (e) {
 			console.log(e);
 
