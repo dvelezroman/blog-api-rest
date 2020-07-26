@@ -1,15 +1,6 @@
 const User = require('../../models').User;
 module.exports = {
 	async getUser(req, res) {
-		// [
-		// 	{
-		// 		"id": 1,
-		// 		"email": "dario@gmail.com",
-		// 		"password": "1234",
-		// 		"createdAt": "2020-07-24T02:03:44.631Z",
-		// 		"updatedAt": "2020-07-24T02:03:44.631Z"
-		// 	}
-		// ]
 		try {
 			const { user } = req.body;
 			const userCollection = await User.findAll({
