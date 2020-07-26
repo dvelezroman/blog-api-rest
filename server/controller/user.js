@@ -20,7 +20,7 @@ const UserRoutes = {
 				});
 			}
 			let userData;
-			// if is in cache I have to parse the data to do the login process
+			// if userData is in cache I have to parse the data to do the login process
 			if (isInCache) {
 				userData = userCollection;
 			} else {
@@ -101,11 +101,14 @@ const UserRoutes = {
 
 	async getAllUsers(req, res) {
 		try {
-			let usersCollection = UserCache.USERS_CACHE.data;
-			if (usersCollection.length === 0) {
+			let usersCollection = UserCache.CACHE.data;
+			if (!Object.keys(usersCollection).length) {
 				usersCollection = await User.findAll({});
 			}
-			res.status(200).json(usersCollection);
+			res.status(200).json({
+				status: true,
+				data: usersCollection,
+			});
 		} catch (e) {
 			console.log(e);
 
@@ -120,8 +123,11 @@ const UserRoutes = {
 				password: req.body.password,
 			});
 			const usersCollection = await User.findAll({});
-			UserCache.setItems[usersCollection];
-			res.status(201).send(userCreatedCollection);
+			UserCache.setItems(usersCollection);
+			res.status(201).json({
+				status: true,
+				data: userCreatedCollection,
+			});
 		} catch (e) {
 			console.log(e);
 			res.status(400).send(e);
