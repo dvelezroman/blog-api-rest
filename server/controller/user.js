@@ -3,14 +3,16 @@ const Session = require('../../models').Session;
 const UserCache = require('./userCache');
 const { v4: uuidv4 } = require('uuid');
 
-module.exports = {
+const UserRoutes = {
 	async getUser(req, res) {
 		try {
 			const { user } = req.body;
 			let isInCache = true;
 			let userCollection = UserCache.getItem(user.email);
+			// if userData is not in CACHE
 			if (!userCollection) {
 				isInCache = false;
+				// get the data from DATABASE
 				userCollection = await User.findAll({
 					where: {
 						email: user.email,
@@ -18,6 +20,7 @@ module.exports = {
 				});
 			}
 			let userData;
+			// if is in cache I have to parse the data to do the login process
 			if (isInCache) {
 				userData = userCollection;
 			} else {
@@ -39,6 +42,7 @@ module.exports = {
 						session.status = true;
 						await session.save();
 					}
+					// store the userData in cache in order to have the data for future querys
 					UserCache.setItem(userData);
 					res.status(200).json({
 						status: true,
@@ -146,3 +150,5 @@ module.exports = {
 		}
 	},
 };
+
+module.exports = UserRoutes;
