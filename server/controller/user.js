@@ -25,15 +25,20 @@ module.exports = {
 			}
 			if (userData) {
 				if (userData.password === user.password) {
-					await Session.update(
-						{ token, status: true },
-						{
-							where: {
-								userId: userData.id,
-							},
-						}
-					);
-					userData.token = token;
+					const token = uuidv4();
+					const [session, created] = await Session.findOrCreate({
+						where: { userId: userData.id },
+						defaults: {
+							token,
+							status: true,
+							userId: userData.id,
+						},
+					});
+					if (!created) {
+						session.token = token;
+						session.status = true;
+						await session.save();
+					}
 					UserCache.setItem(userData);
 					res.status(200).json({
 						status: true,
@@ -71,11 +76,18 @@ module.exports = {
 				},
 			});
 			if (sessionInstance.length) {
-				sessionInstance[0].status = false;
-				await sessionInstance.save();
+				await sessionInstance[0].update({
+					status: false,
+					token: '',
+				});
 				res.status(200).json({
 					status: true,
 					message: 'logout successful.',
+				});
+			} else {
+				res.status(200).json({
+					status: false,
+					message: 'user already logout.',
 				});
 			}
 		} catch (e) {

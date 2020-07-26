@@ -12,6 +12,8 @@ module.exports = app => {
 
 	app.post(`${API_VERSION}/users/login`, userController.getUser);
 
+	app.post(`${API_VERSION}/users/logout`, userController.logout);
+
 	app.post(`${API_VERSION}/users/create`, userController.create);
 
 	app.put(`${API_VERSION}/users/:userId`, userController.update);
