@@ -10,7 +10,7 @@ app.use(
 	})
 );
 
-require('./server/router/v1')(app);
+require('./v1')(app);
 
 describe('V1 Routes', () => {
 	test('index route works', done => {

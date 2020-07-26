@@ -5,7 +5,9 @@
 	"main": "server.js",
 	"scripts": {
 		"start": "PORT=3000 nodemon index.js",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"migrate": "npx sequelize-cli db:migrate",
+		"migrate:reset": "npx sequelize-cli db:migrate:undo:all && npm run migrate",
+		"test": "NODE_ENV=development jest"
 	},
 	"author": "Dario Velez Roman",
 	"license": "ISC",
@@ -21,6 +23,8 @@
 		"uuid": "^8.2.0"
 	},
 	"devDependencies": {
+		"cross-env": "^7.0.2",
+		"jest": "^26.1.0",
 		"nodemon": "^2.0.4",
 		"supertest": "^4.0.2"
 	}
