@@ -1,41 +1,48 @@
 const User = require('../../models').User;
+const Session = require('../../models').Session;
+const UserCache = require('./userCache');
+const { v4: uuidv4 } = require('uuid');
 
 module.exports = {
-	USERS_CACHE: {},
-
-	clearCache() {
-		for (let key in USERS_CACHE) delete USERS_CACHE[key];
-	},
-
-	getItem(key) {
-		if (USERS_CACHE[key] !== undefined) {
-			return USERS_CACHE[key];
-		}
-		return null;
-	},
-
-	deleteItem(key) {
-		if (USERS_CACHE[key] !== undefined) {
-			delete USERS_CACHE[key];
-		}
-	},
-
 	async getUser(req, res) {
 		try {
 			const { user } = req.body;
-			const userCollection = await User.findAll({
-				where: {
-					email: user.email,
-				},
-			});
-			if (userCollection.length) {
-				const userData = userCollection[0];
+			let isInCache = true;
+			let userCollection = UserCache.getItem(user.email);
+			if (!userCollection) {
+				isInCache = false;
+				userCollection = await User.findAll({
+					where: {
+						email: user.email,
+					},
+				});
+			}
+			let userData;
+			if (isInCache) {
+				userData = userCollection;
+			} else {
+				userData = userCollection.length ? userCollection[0] : null;
+			}
+			if (userData) {
 				if (userData.password === user.password) {
+					await Session.update(
+						{ token, status: true },
+						{
+							where: {
+								userId: userData.id,
+							},
+						}
+					);
+					userData.token = token;
+					UserCache.setItem(userData);
 					res.status(200).json({
 						status: true,
 						data: {
-							email: user.email,
+							id: userData.id,
+							email: userData.email,
 						},
+						token,
+						isInCache,
 					});
 				} else {
 					res.status(200).json({
@@ -43,11 +50,34 @@ module.exports = {
 						message: 'wrong email or password',
 					});
 				}
+			} else {
+				res.status(200).json({
+					status: false,
+					message: 'email not registered.',
+				});
 			}
-			res.status(200).json({
-				status: false,
-				message: 'email not registered.',
+		} catch (e) {
+			res.status(400).send(e.message);
+		}
+	},
+
+	async logout(req, res) {
+		try {
+			const { user } = req.body;
+			const sessionInstance = await Session.findAll({
+				where: {
+					userId: user.id,
+					status: true,
+				},
 			});
+			if (sessionInstance.length) {
+				sessionInstance[0].status = false;
+				await sessionInstance.save();
+				res.status(200).json({
+					status: true,
+					message: 'logout successful.',
+				});
+			}
 		} catch (e) {
 			res.status(400).send(e.message);
 		}
@@ -55,8 +85,11 @@ module.exports = {
 
 	async getAllUsers(req, res) {
 		try {
-			const userCollection = await User.findAll({});
-			res.status(200).json(userCollection);
+			let usersCollection = UserCache.USERS_CACHE.data;
+			if (usersCollection.length === 0) {
+				usersCollection = await User.findAll({});
+			}
+			res.status(200).json(usersCollection);
 		} catch (e) {
 			console.log(e);
 
@@ -66,12 +99,13 @@ module.exports = {
 
 	async create(req, res) {
 		try {
-			const userCollection = await User.create({
+			const userCreatedCollection = await User.create({
 				email: req.body.email,
 				password: req.body.password,
 			});
-
-			res.status(201).send(userCollection);
+			const usersCollection = await User.findAll({});
+			UserCache.setItems[usersCollection];
+			res.status(201).send(userCreatedCollection);
 		} catch (e) {
 			console.log(e);
 			res.status(400).send(e);

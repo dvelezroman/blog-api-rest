@@ -11,6 +11,10 @@ module.exports = {
 				type: Sequelize.BOOLEAN,
 				allowNull: false,
 			},
+			token: {
+				type: Sequelize.STRING,
+				allowNull: false,
+			},
 			userId: {
 				type: Sequelize.INTEGER,
 				onDelete: 'CASCADE',
