@@ -11,9 +11,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 require('./v1')(app);
 
-// on the tests
-afterAll(() => app.close());
-
 describe('V1 Routes', () => {
 	test('index route works', done => {
 		request(app)
