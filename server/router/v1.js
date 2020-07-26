@@ -1,5 +1,6 @@
 const userController = require('../controller/user');
 const postController = require('../controller/post');
+var auth = require('../controller/authentication');
 
 const API_VERSION = '/api/v1';
 
@@ -16,13 +17,29 @@ module.exports = app => {
 
 	app.post(`${API_VERSION}/users/create`, userController.create);
 
-	app.put(`${API_VERSION}/users/:userId`, userController.update);
+	app.put(
+		`${API_VERSION}/users/:userId`,
+		auth.isAuthorized,
+		userController.update
+	);
 
 	app.get(`${API_VERSION}/users`, userController.getAllUsers);
 
-	app.post(`${API_VERSION}/posts/create`, postController.createPost);
+	app.post(
+		`${API_VERSION}/posts/create`,
+		auth.isAuthorized,
+		postController.createPost
+	);
 
-	app.put(`${API_VERSION}/posts/:postId`, postController.update);
+	app.put(
+		`${API_VERSION}/posts/:postId`,
+		auth.isAuthorized,
+		postController.update
+	);
 
-	app.get(`${API_VERSION}/posts`, postController.getAllPostsOfUser);
+	app.get(
+		`${API_VERSION}/posts/:userId`,
+		auth.isAuthorized,
+		postController.getAllPostsOfUser
+	);
 };

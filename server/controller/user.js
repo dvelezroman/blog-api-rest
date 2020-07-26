@@ -104,6 +104,10 @@ const UserRoutes = {
 			let usersCollection = UserCache.CACHE.data;
 			if (!Object.keys(usersCollection).length) {
 				usersCollection = await User.findAll({});
+			} else {
+				usersCollection = Object.keys(usersCollection).map(
+					key => usersCollection[key]
+				);
 			}
 			res.status(200).json({
 				status: true,

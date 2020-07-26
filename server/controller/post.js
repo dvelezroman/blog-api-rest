@@ -1,21 +1,28 @@
 const Post = require('../../models').Post;
 const User = require('../../models').User;
+const Session = require('../../models').Session;
+const PostCache = require('./postCache');
 
 module.exports = {
 	async getAllPostsOfUser(req, res) {
 		try {
-			const userCollection = await User.find({
-				id: req.params.userId,
+			const userCollection = await User.findAll({
+				where: { id: req.params.userId },
 			});
-
-			if (userCollection) {
-				const postCollection = await Post.find({
+			if (userCollection.length) {
+				const postCollection = await Post.findAll({
 					userId: req.params.userId,
 				});
 
-				res.status(201).send(postCollection);
+				res.status(200).json({
+					status: true,
+					data: postCollection,
+				});
 			} else {
-				re.status(404).send('User Not Found');
+				res.status(200).json({
+					status: false,
+					message: 'User Not Found',
+				});
 			}
 		} catch (e) {
 			console.log(e);
@@ -27,9 +34,15 @@ module.exports = {
 		try {
 			const post = await Post.create({
 				title: req.body.title,
+				type: req.body.type,
+				content: req.body.content,
 				userId: req.body.userId,
 			});
-			res.status(201).send(post);
+			res.status(201).json({
+				status: true,
+				message: 'Post successfully created.',
+				data: post,
+			});
 		} catch (e) {
 			console.log(e);
 			res.status(400).send(e);
