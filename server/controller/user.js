@@ -1,5 +1,25 @@
 const User = require('../../models').User;
+
 module.exports = {
+	USERS_CACHE: {},
+
+	clearCache() {
+		for (let key in USERS_CACHE) delete USERS_CACHE[key];
+	},
+
+	getItem(key) {
+		if (USERS_CACHE[key] !== undefined) {
+			return USERS_CACHE[key];
+		}
+		return null;
+	},
+
+	deleteItem(key) {
+		if (USERS_CACHE[key] !== undefined) {
+			delete USERS_CACHE[key];
+		}
+	},
+
 	async getUser(req, res) {
 		try {
 			const { user } = req.body;
