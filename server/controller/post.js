@@ -1,7 +1,6 @@
 const Post = require('../../models').Post;
 const User = require('../../models').User;
-const Session = require('../../models').Session;
-const PostCache = require('./postCache');
+const { Op } = require('sequelize');
 
 module.exports = {
 	async getAllPosts(req, res) {
@@ -35,6 +34,27 @@ module.exports = {
 			res.status(200).json({
 				status: true,
 				data: postCollection,
+			});
+		} catch (e) {
+			console.log(e);
+			res.status(500).send(e);
+		}
+	},
+
+	async filterPostsBy(req, res) {
+		try {
+			const foundPosts = await Post.findAll({
+				where: {
+					content: {
+						[Op.like]: '%' + req.body.query + '%',
+					},
+					type: 'public',
+				},
+				include: User,
+			});
+			res.status(200).json({
+				status: true,
+				data: foundPosts,
 			});
 		} catch (e) {
 			console.log(e);
@@ -87,9 +107,34 @@ module.exports = {
 		}
 	},
 
+	async delete(req, res) {
+		try {
+			const deletedPost = await Post.destroy({
+				where: {
+					id: req.body.postId,
+					userId: req.body.userId,
+				},
+			});
+
+			if (deletedPost) {
+				res.status(201).json({
+					status: true,
+					message: 'Post successfully destroyed.',
+				});
+			}
+			res.status(200).json({
+				status: true,
+				message: 'You are not the owner of this post.',
+			});
+		} catch (e) {
+			console.log(e);
+			res.status(400).send(e);
+		}
+	},
+
 	async update(req, res) {
 		try {
-			const postCollection = await Post.find({
+			const postCollection = await Post.findAll({
 				id: req.params.postId,
 			});
 

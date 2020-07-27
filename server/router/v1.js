@@ -49,5 +49,17 @@ module.exports = app => {
 		postController.getAllPostsOfUser
 	);
 
+	app.post(
+		`${API_VERSION}/posts/filter`,
+		auth.isAuthorized,
+		postController.filterPostsBy
+	);
+
+	app.post(
+		`${API_VERSION}/posts/delete`,
+		auth.isAuthorized,
+		postController.delete
+	);
+
 	app.get(`${API_VERSION}/posts`, postController.getAllPosts);
 };
