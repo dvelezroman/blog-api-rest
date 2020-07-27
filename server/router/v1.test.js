@@ -139,13 +139,13 @@ describe('API V1 Routes', () => {
 				.expect(201, done);
 		});
 
-		test('get posts - two posts', done => {
+		test('get posts - one posts [because just one public]', done => {
 			request(app)
 				.get('/api/v1/posts')
 				.expect('Content-Type', /json/)
 				.expect(response => {
 					expect(response.status).toBe(200);
-					expect(response.body.data.length).toBe(2);
+					expect(response.body.data.length).toBe(1);
 				})
 
 				.expect(200, done);
