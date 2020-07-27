@@ -25,9 +25,11 @@ class UserCacheRaw {
 
 	setItems(users) {
 		this.CACHE.regs = users.length;
-		users.forEach(function (user) {
-			this.CACHE.data[user.email] = user;
+		const updatedCache = {};
+		users.forEach(user => {
+			updatedCache[user.email] = user;
 		});
+		this.CACHE.data = updatedCache;
 	}
 
 	deleteItem(key) {

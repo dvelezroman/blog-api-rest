@@ -10,6 +10,7 @@ module.exports = {
 				where: {
 					type: 'public',
 				},
+				include: User,
 			});
 
 			res.status(200).json({
