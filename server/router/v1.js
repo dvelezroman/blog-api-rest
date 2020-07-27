@@ -38,8 +38,16 @@ module.exports = app => {
 	);
 
 	app.get(
+		`${API_VERSION}/posts/:userId/drafts`,
+		auth.isAuthorized,
+		postController.getMyDraftPosts
+	);
+
+	app.get(
 		`${API_VERSION}/posts/:userId`,
 		auth.isAuthorized,
 		postController.getAllPostsOfUser
 	);
+
+	app.get(`${API_VERSION}/posts`, postController.getAllPosts);
 };

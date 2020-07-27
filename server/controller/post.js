@@ -4,6 +4,43 @@ const Session = require('../../models').Session;
 const PostCache = require('./postCache');
 
 module.exports = {
+	async getAllPosts(req, res) {
+		try {
+			const postCollection = await Post.findAll({
+				where: {
+					type: 'public',
+				},
+			});
+
+			res.status(200).json({
+				status: true,
+				data: postCollection,
+			});
+		} catch (e) {
+			console.log(e);
+			res.status(500).send(e);
+		}
+	},
+
+	async getMyDraftPosts(req, res) {
+		try {
+			const postCollection = await Post.findAll({
+				where: {
+					type: 'draft',
+					userId: req.params.userId,
+				},
+			});
+
+			res.status(200).json({
+				status: true,
+				data: postCollection,
+			});
+		} catch (e) {
+			console.log(e);
+			res.status(500).send(e);
+		}
+	},
+
 	async getAllPostsOfUser(req, res) {
 		try {
 			const userCollection = await User.findAll({
